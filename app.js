@@ -39,3 +39,11 @@ app.get("/players/:playerId/", async (request, response) => {
   const player = await db.get(getPlayerQuery, [playerId]);
   response.json(player);
 });
+
+app.put("/players/:playerId/", async (request, response) => {
+  const { playerId } = request.params;
+  const { playerName } = request.body;
+  const updateQuery = `update player_details set playerName=? where player_id=?;`;
+  await db.run(updateQuery, [playerName, playerId]);
+  response.send("Player Details Updated");
+});
