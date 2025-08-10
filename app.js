@@ -71,3 +71,12 @@ app.get("/players/:playerId/matches", async (request, response) => {
   const matches = await db.all(getPlayerMatchesQuery, [playerId]);
   response.json(matches);
 });
+
+app.get("/matches/:matchId/players", async (request, response) => {
+  const { matchId } = request.params;
+  const getPlayersOfMatch = `SELECT player_details.player_id as playerId,player_details.player_name as playerName 
+     from player_details inner join player_match_score
+     on player_details.player_id=player_match_score.player_id where player_match_score.match_id=?`;
+  const players = await db.all(getPlayersOfMatch, [matchId]);
+  response.send(players);
+});
