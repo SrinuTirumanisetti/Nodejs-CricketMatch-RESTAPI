@@ -27,7 +27,7 @@ InitializeDBAndServer();
 app.get("/players", async (request, response) => {
   const getPlayersQuery = `SELECT * FROM player_details ORDER BY player_id;`;
   const players = await db.all(getPlayersQuery);
-  response.json(players);
+  response.send(players);
 });
 
 app.get("/players/:playerId/", async (request, response) => {
@@ -37,7 +37,7 @@ app.get("/players/:playerId/", async (request, response) => {
       WHERE player_id = ?;
     `;
   const player = await db.get(getPlayerQuery, [playerId]);
-  response.json(player);
+  response.send(player);
 });
 
 app.put("/players/:playerId/", async (request, response) => {
@@ -52,5 +52,22 @@ app.get("/matches/:matchId/", async (request, response) => {
   const { matchId } = request.params;
   const getMatchQuery = `SELECT * FROM match_details where match_id=?;`;
   const match = await db.get(getMatchQuery, [matchId]);
-  response.json(match);
+  response.send(match);
+});
+
+app.get("/players/:playerId/matches", async (request, response) => {
+  const { playerId } = request.params;
+  const getPlayerMatchesQuery = `
+      SELECT 
+        match_details.match_id AS matchId,
+        match_details.match AS match,
+        match_details.year AS year
+      FROM player_match_score
+      INNER JOIN match_details
+      ON player_match_score.match_id = match_details.match_id
+      WHERE player_match_score.player_id = ?;
+    `;
+
+  const matches = await db.all(getPlayerMatchesQuery, [playerId]);
+  response.json(matches);
 });
