@@ -23,3 +23,9 @@ const InitializeDBAndServer = async () => {
 };
 
 InitializeDBAndServer();
+
+app.get("/players", async (request, response) => {
+  const getPlayersQuery = `SELECT * FROM player_details ORDER BY player_id;`;
+  const players = await db.all(getPlayersQuery);
+  response.send(players);
+});
